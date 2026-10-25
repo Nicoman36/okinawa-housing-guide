@@ -1,0 +1,68 @@
+name: Renter experience report
+description: Tell other renters how an agency treated you. Reports are read by a person before anything is published.
+title: "[Experience] "
+labels: ["experience", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Please share facts, not rants. **Do not include** your name, unit number, phone, email or anyone else's personal details.
+        We publish short answers and an optional comment after review. We may edit for length or remove personal details, and we do not publish anything that accuses a named person.
+  - type: input
+    id: agency
+    attributes:
+      label: Agency name (as it appears on the site)
+    validations:
+      required: true
+  - type: input
+    id: month
+    attributes:
+      label: Month you signed or moved in (e.g. 2026-08)
+    validations:
+      required: true
+  - type: dropdown
+    id: english
+    attributes:
+      label: Could you get things done in English?
+      options: ["Yes, easily", "Some, with effort", "No"]
+    validations:
+      required: true
+  - type: dropdown
+    id: fees_clear
+    attributes:
+      label: Were all fees explained before you signed?
+      options: ["Yes", "Mostly", "No"]
+    validations:
+      required: true
+  - type: dropdown
+    id: cost_matched
+    attributes:
+      label: Did the final cost match what you were first quoted?
+      options: ["Yes", "Slightly higher", "Much higher"]
+    validations:
+      required: true
+  - type: dropdown
+    id: housing_office
+    attributes:
+      label: Housing office dealings (inspection, lease addendum)
+      options: ["Not applicable", "Smooth", "Some trouble", "A lot of trouble"]
+    validations:
+      required: true
+  - type: dropdown
+    id: use_again
+    attributes:
+      label: Would you use this agency again?
+      options: ["Yes", "Maybe", "No"]
+    validations:
+      required: true
+  - type: textarea
+    id: comment
+    attributes:
+      label: Anything else (optional, under 400 characters)
+  - type: checkboxes
+    id: ok
+    attributes:
+      label: Confirm
+      options:
+        - label: This is my own experience as a renter with this agency, and I included no personal details.
+          required: true

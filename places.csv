@@ -1,0 +1,17 @@
+id,name_en,name_ja,kind,lat,lon,precision,source,note
+kadena-ab,Kadena Air Base,嘉手納基地,base,26.35167,127.76944,point,Wikipedia (EN),Point inside the installation; gates are on its edges.
+camp-foster,Camp Foster (Camp Zukeran),キャンプ瑞慶覧,base,26.30139,127.77972,point,Wikipedia (JA),Point inside the installation.
+camp-kinser,Camp Kinser,キャンプ・キンザー,base,26.25253,127.6974,point,Wikipedia (EN),Point inside the installation.
+camp-lester,Camp Lester (Camp Kuwae),キャンプ桑江,base,26.31945,127.76595,area,GSI address search (town centre of Kuwae),Approximate: centre of the Kuwae district.
+mcas-futenma,MCAS Futenma,普天間飛行場,base,26.27083,127.74806,point,Wikipedia (EN),Point inside the installation.
+camp-courtney,Camp Courtney,キャンプ・コートニー,base,26.3901,127.85884,area,GSI address search (town centre of Tengan),Approximate: centre of the Tengan district.
+camp-mctureous,Camp McTureous,キャンプ・マクトリアス,base,26.37991,127.84404,point,Wikipedia (JA),Point inside the installation.
+camp-shields,Camp Shields,キャンプ・シールズ,base,26.35991,127.81688,area,GSI address search (town centre of Chibana),Approximate: centre of the Chibana district.
+camp-hansen,Camp Hansen,キャンプ・ハンセン,base,26.46,127.92,area,Wikipedia (EN),Approximate (coordinates given to 2 decimals).
+camp-schwab,Camp Schwab,キャンプ・シュワブ,base,26.53496,128.02788,area,GSI address search (town centre of Henoko),Approximate: centre of the Henoko district.
+torii-station,Torii Station,トリイ通信施設,base,26.37919,127.73669,point,Wikipedia (EN),Point inside the installation.
+white-beach,White Beach Naval Facility,ホワイト・ビーチ地区,base,26.30146,127.91249,point,Wikipedia (JA),Point inside the installation.
+naha-port,Naha Military Port,那覇港湾施設,base,26.20833,127.66667,area,Wikipedia (JA),Approximate (coordinates given to the arc-minute).
+naha-airport,Naha Airport,那覇空港,landmark,26.19583,127.64583,point,Wikipedia (EN),
+american-village,American Village (Mihama),アメリカンビレッジ（美浜）,landmark,26.31169,127.76137,area,GSI address search (town centre of Mihama),Centre of the Mihama district.
+aeon-rycom,AEON Mall Okinawa Rycom,イオンモール沖縄ライカム,landmark,26.31458,127.79604,point,GSI address search,

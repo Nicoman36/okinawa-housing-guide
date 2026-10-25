@@ -1,0 +1,17 @@
+{
+  "site_name": "Okinawa Housing Agency Directory",
+  "site_name_ja": "沖縄 不動産会社ディレクトリ",
+  "tagline": "Find a rental agency in Okinawa that works with U.S. Forces members and foreign residents.",
+  "base_url": "https://okinawahousing.example",
+  "base_path": "",
+  "github_repo": "OWNER/okinawa-housing-agencies",
+  "contact_email": "info@okinawahousing.example",
+  "data_license": "CC BY 4.0 (our compilation of facts; underlying facts belong to no one — see Sources)",
+  "index_unverified_pages": false,
+  "stale_days": {"A": 180, "B": 365, "C": 365, "D": 90},
+  "_owner_note": "Replace base_url, github_repo and contact_email before publishing. These are the only values that must change.",
+  "analytics_snippet": "",
+  "_analytics_note": "Optional. Paste a cookie-free analytics <script> tag (e.g. GoatCounter / Plausible / Cloudflare Web Analytics) as one string.",
+  "use_github": false,
+  "_use_github_note": "false = every 'report a problem' link is an email link (no GitHub needed). true = GitHub issue forms from .github/ISSUE_TEMPLATE/."
+}

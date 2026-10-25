@@ -1,0 +1,19 @@
+name: I work here — update or remove our listing
+description: Agency staff and owners
+title: "[Agency] "
+labels: ["data", "owner"]
+body:
+  - type: input
+    id: listing
+    attributes: {label: Listing ID or name}
+    validations: {required: true}
+  - type: dropdown
+    id: action
+    attributes: {label: What would you like?, options: ["Update details", "Remove listing"]}
+    validations: {required: true}
+  - type: textarea
+    id: details
+    attributes: {label: New details, description: "Phone, hours, licence number, languages spoken, military/SOFA handling, services."}
+  - type: input
+    id: proof
+    attributes: {label: Link that shows you work here, description: "Official website or social page is enough."}

@@ -1,0 +1,25 @@
+name: Report incorrect info
+description: A listing is wrong, closed, moved or out of date
+title: "[Edit] "
+labels: ["data", "needs-triage"]
+body:
+  - type: input
+    id: listing
+    attributes: {label: Listing ID, description: "Pre-filled from the listing page.", placeholder: "e.g. ace-family-housing"}
+    validations: {required: true}
+  - type: dropdown
+    id: problem
+    attributes:
+      label: What's wrong?
+      options: ["Closed / no longer operating", "Moved to a new address", "Wrong phone / website / hours", "Wrong services", "Licence number / language / military info to add", "Other"]
+    validations: {required: true}
+  - type: textarea
+    id: details
+    attributes: {label: Correct details, description: "New address, phone, website, hours, licence number — whatever you know."}
+    validations: {required: true}
+  - type: input
+    id: how
+    attributes: {label: How do you know?, description: "e.g. I rented through them last month; their website; I called."}
+  - type: dropdown
+    id: role
+    attributes: {label: Your connection, options: ["I'm a renter / visitor", "I work at this agency", "Just noticed"]}

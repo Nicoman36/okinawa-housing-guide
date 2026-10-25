@@ -1,0 +1,6 @@
+dist/
+data/work/
+body.md
+__pycache__/
+*.pyc
+dist_extras/

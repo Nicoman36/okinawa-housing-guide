@@ -1,0 +1,21 @@
+name: Monthly verification queue
+on:
+  schedule: [{cron: "0 0 1 * *"}]
+  workflow_dispatch:
+permissions: {contents: read, issues: write}
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python3 scripts/stale_report.py
+      - run: python3 scripts/check_links.py
+      - name: Open the month's issue
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: |
+          cat data/work/verification_queue.md > body.md
+          printf '\n\n' >> body.md
+          cat data/work/link_report.md >> body.md
+          gh issue create --title "Verification queue — $(date +%Y-%m)" --label verification --body-file body.md

@@ -1,0 +1,26 @@
+name: Add a missing agency
+description: An agency or office we haven't listed
+title: "[Add] "
+labels: ["data", "new-listing"]
+body:
+  - type: input
+    id: name
+    attributes: {label: Agency name (English and/or Japanese)}
+    validations: {required: true}
+  - type: input
+    id: area
+    attributes: {label: Town or area of the office, placeholder: "e.g. Chatan, Okinawa City"}
+    validations: {required: true}
+  - type: input
+    id: contact
+    attributes: {label: Website, phone or social link}
+    validations: {required: true}
+  - type: dropdown
+    id: services
+    attributes:
+      label: What do they offer?
+      multiple: true
+      options: ["Houses & duplexes", "Apartments & condos", "Furnished & short-term stays", "Buying & selling", "Property management", "Move-in & relocation help"]
+  - type: input
+    id: how
+    attributes: {label: How do you know about them?, description: "e.g. I rented through them; a friend; their website."}

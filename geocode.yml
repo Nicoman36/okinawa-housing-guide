@@ -1,0 +1,27 @@
+name: Geocode addresses
+on: workflow_dispatch
+permissions:
+  contents: write
+  actions: write
+jobs:
+  geo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/geocode.py
+      - run: python3 scripts/validate_data.py
+      - name: Save coordinates
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add data/locations.csv
+          git commit -m "Add coordinates from GSI address search" || echo "Nothing to commit"
+          git push
+      # Commits pushed with the default token do not trigger "Build & deploy", but workflow_dispatch does.
+      - name: Rebuild the site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref "${GITHUB_REF_NAME}"
