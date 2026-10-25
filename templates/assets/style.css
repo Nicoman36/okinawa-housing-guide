@@ -62,7 +62,13 @@ nav.main details[open]>.menu{display:grid}
 .menu h3{grid-column:1/-1;margin:8px 8px 2px;font-family:var(--sans);font-size:.8rem;font-weight:600;color:var(--muted);letter-spacing:0}
 .menu a{display:flex;justify-content:space-between;gap:8px}
 .menu a span.n{color:var(--muted);font-variant-numeric:tabular-nums}
-@media (max-width:640px){.menu{grid-template-columns:1fr;right:-8px}}
+@media (max-width:760px){
+  nav.main{margin-left:0;width:100%;gap:0}
+  nav.main details{position:static}
+  nav.main a,nav.main summary{padding:8px 10px}
+  .menu,.menu.list{position:absolute;left:8px;right:8px;top:100%;width:auto;min-width:0;max-height:min(70vh,520px);overflow-y:auto;grid-template-columns:1fr;margin-top:6px}
+  .menu a{padding:10px 12px}
+}
 
 /* ---------- buttons, form controls */
 input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px;min-height:44px}
