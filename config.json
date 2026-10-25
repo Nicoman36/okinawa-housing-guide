@@ -3,7 +3,7 @@
   "site_name_ja": "沖縄 不動産会社ディレクトリ",
   "tagline": "Find a rental agency in Okinawa that works with U.S. Forces members and foreign residents.",
   "base_url": "https://okinawahousing.example",
-  "base_path": "",
+  "base_path": "/your-repo-name",
   "github_repo": "OWNER/okinawa-housing-agencies",
   "contact_email": "info@okinawahousing.example",
   "data_license": "CC BY 4.0 (our compilation of facts; underlying facts belong to no one — see Sources)",
