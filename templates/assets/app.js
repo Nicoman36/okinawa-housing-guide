@@ -54,6 +54,7 @@
     if(x.d.length>3) h+='<span class="chip">+'+(x.d.length-3)+'</span>';
     h+='</div><div class="meta"><span><i class="ico pin"></i>'+esc(x.a||x.m_en||U.noloc)+'</span>';
     if(x._km!=null) h+='<span><b>'+x._km.toFixed(1)+' '+U.km+'</b>'+(rp?' '+esc(refName(el.ref.value)):'')+'</span>';
+    if(x.oh) h+='<span class="open-badge" data-oh="'+esc(x.oh)+'"></span>';
     if(x.h) h+='<span><i class="ico clock"></i>'+esc(x.h.length>40?x.h.slice(0,38)+'\u2026':x.h)+'</span>';
     if(x.p) h+='<a href="tel:'+esc(x.p.replace(/[^0-9+]/g,''))+'"><i class="ico tel"></i>'+esc(x.p)+'</a>';
     if(x.w) h+='<a href="'+esc(x.w)+'" rel="noopener nofollow"><i class="ico web"></i>'+U.website.replace(' \u2197','')+'</a>';

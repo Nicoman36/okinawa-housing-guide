@@ -1,0 +1,23 @@
+name: Weekly link check
+on:
+  schedule: [{cron: "0 0 * * 1"}]   # Mondays 09:00 JST
+  workflow_dispatch:
+permissions: {contents: read, issues: write}
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python3 scripts/check_links.py
+      - name: Open or update the broken-links issue
+        env: {GH_TOKEN: "${{ github.token }}"}
+        run: |
+          bad=$(grep -c '^- `' data/work/link_report.md || true)
+          echo "Broken or blocked links: $bad"
+          [ "$bad" -eq 0 ] && exit 0
+          gh label create links --color d93f0b --description "Agency website problems" 2>/dev/null || true
+          num=$(gh issue list --label links --state open --json number -q '.[0].number')
+          if [ -n "$num" ]; then gh issue comment "$num" --body-file data/work/link_report.md
+          else gh issue create --title "Agency websites to check" --label links --body-file data/work/link_report.md; fi

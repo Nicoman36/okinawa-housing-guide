@@ -48,3 +48,11 @@ Modern, sharp look: Bricolage Grotesque (display) and Instrument Sans (body), bo
 ## Guides (English only)
 
 `/guides/` hub plus move-in, rent-prices, avoid-problems, living-in-okinawa and oha pages, built by `build_guides()` in `scripts/extra_pages.py`. Each page lists sources and a review date; figures (OHA rates, agency rent ranges) come from Stars and Stripes, 11 May 2026, and must be re-checked when rates change. The Kadena vehicle article and the Stripes mold article are old or undated, so they are used only for general lessons.
+
+## Open-now badges and link checks
+
+- `open_hours` (optional, in `data/locations.csv`) drives the "Open now / Closed · opens …" badge. Format: `mon-fri 09:00-17:00; sat 09:00-14:00` (day or day range, 24-hour times, parts separated by `;`). Leave it empty when hours are irregular (for example "1st and 3rd Tuesday"); the free-text `hours` column is still shown. Badges use Japan time and do not know public holidays or lunch breaks; the tooltip says so.
+- **Weekly link check** (`.github/workflows/link-check.yml`) runs every Monday, and opens or updates one "Agency websites to check" issue when sites fail. A 403/405 can be a bot block rather than a dead site.
+- The monthly verification queue creates its own `verification` label if it is missing.
+
+The repository on GitHub is now the source of truth; edit here and push, and **Build & deploy** publishes automatically.

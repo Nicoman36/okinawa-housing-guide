@@ -33,11 +33,14 @@ for r in rows:
             la, lo = float(r["lat"]), float(r["lon"])
             if not (23.5 < la < 28.6 and 122.5 < lo < 131.5): errs.append(f"{i}: coordinates outside Okinawa")
         except ValueError: errs.append(f"{i}: bad lat/lon")
+    if r.get("open_hours"):
+        for part in r["open_hours"].split(";"):
+            if not re.fullmatch(r"\s*(mon|tue|wed|thu|fri|sat|sun)(-(mon|tue|wed|thu|fri|sat|sun))? \d\d:\d\d-\d\d:\d\d\s*", part): errs.append(f"{i}: open_hours part {part!r} must look like 'mon-fri 09:00-17:00'")
     if r["phone"] and not re.search(r"\d", r["phone"]): warns.append(f"{i}: phone has no digits")
     if r["website"] and not re.match(r"(https?://|[\w.-]+\.\w+)", r["website"]): warns.append(f"{i}: odd website")
     if r["kind"] == "agency" and r["verification"] in ("A", "B") and not r["license"]: warns.append(f"{i}: no licence number recorded")
     if re.match(r"\s*0[789]0-?\d{4}-?\d{4}\s*$", r["phone"] or ""): warns.append(f"{i}: phone looks like a personal mobile — check privacy policy before publishing")
-    if r["military"] and not re.match(r"(yes|reported|likely)\b", r["military"], re.I): warns.append(f"{i}: military column should start with Yes / Reported / Likely (or be empty)")
+    if r["military"] and not re.match(r"(yes|reported|likely|unknown|no)\b", r["military"], re.I): warns.append(f"{i}: military column should start with Yes / Reported / Likely / Unknown / No (or be empty)")
 
 ids = {r["id"] for r in rows}
 if rows and any(r.get("segment") not in ("", "local", None) for r in rows): errs.append("segment must be blank or 'local'")

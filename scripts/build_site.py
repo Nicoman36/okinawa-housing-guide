@@ -150,6 +150,9 @@ def page(path, title, desc, body, cur="", noindex=False, jsonld=None, extra_head
     en_p = path; ja_p = "/ja" + path
     alt = en_p if LANG == "ja" else ja_p
     hl = f'<link rel="alternate" hreflang="en" href="{CFG["base_url"]}{en_p}"><link rel="alternate" hreflang="ja" href="{CFG["base_url"]}{ja_p}"><link rel="alternate" hreflang="x-default" href="{CFG["base_url"]}{en_p}">'
+    if path.startswith(EN_ONLY):
+        alt = "/ja/" if LANG == "en" else en_p
+        hl = f'<link rel="alternate" hreflang="en" href="{CFG["base_url"]}{en_p}"><link rel="alternate" hreflang="x-default" href="{CFG["base_url"]}{en_p}">'
     ld = f'<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>' if jsonld else ""
     robots = '<meta name="robots" content="noindex,follow">' if noindex else ""
     full = f'''<!doctype html><html lang="{LANG}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -206,6 +209,7 @@ def card(r):
     sec_html = f'<div class="ja"{jl}>{esc(sec)}</div>' if sec else ""
     org = f"<span class='chip org'>{esc(kind_txt(r))}</span>" if r["is_org"] else (f"<span class='chip jp'>{T('Japanese-run','日本の会社')}</span>" if r["local"] else "")
     hrs = f'<span><i class="ico clock"></i>{esc(r["hours"][:48] + ("…" if len(r["hours"]) > 48 else ""))}</span>' if r["hours"] else ""
+    if r.get("open_hours") and r["status"] != "closed": hrs = f'<span class="open-badge" data-oh="{esc(r["open_hours"])}"></span>' + hrs
     nb = near(r, 1, "base")
     dist_html = f'<span><i class="ico dir"></i>{nb[0][0]:.1f} km {T("to","から")} {esc(T(nb[0][1]["name_en"], nb[0][1]["name_ja"]))}</span>' if nb and r["status"] != "closed" and r["kind"] == "agency" else ""
     star = f'<button type="button" class="star-btn" data-id="{r["id"]}" aria-pressed="false" aria-label="{T("Add to shortlist","候補に追加")}" title="{T("Add to shortlist","候補に追加")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5 6.4 5c2 0 3.6 1.1 4.6 2.6h2C14 6.1 15.600 5 17.600 5 21 5 22.800 8.600 21.500 11.800 19.500 16.400 12 21 12 21z"/></svg></button>'
@@ -405,7 +409,7 @@ def build_listing(r):
         row(T("Website","ウェブサイト"), f'<a href="{esc(web)}" rel="noopener nofollow">{esc(r["website"])}</a>' if web else "", raw=True),
         row("SNS" if LANG=="ja" else "Social", f'<a href="{esc(r["social"])}" rel="noopener nofollow">{esc(r["social"])}</a>' if r["social"].startswith("http") else r["social"], raw=True),
         row(T("Email","メール"), f'<a href="mailto:{esc(r["email"])}">{esc(r["email"])}</a>' if r["email"] else "", raw=True),
-        row(T("Office hours","営業時間"), r["hours"]), row(T("Contact person","担当者"), r["contact"]), row(T("Viewings & pick-up","内見・送迎"), r["viewings"]),
+        row(T("Office hours","営業時間"), (f'<span class="open-badge" data-oh="{esc(r["open_hours"])}"></span> ' if r.get("open_hours") else "") + esc(r["hours"]), raw=True) if r["hours"] else "", row(T("Contact person","担当者"), r["contact"]), row(T("Viewings & pick-up","内見・送迎"), r["viewings"]),
         row(T("English","英語対応"), eng), row(T("Military / SOFA","米軍関係・SOFA"), r["military"]), row(T("Also known as","別名"), r["aliases"]),
     ])
     srcs = ", ".join(f'<a href="{url("/sources/")}#{esc(s)}">{esc(SRC[s]["title"].split(" — ")[0][:60])}</a>' for s in r["srcs"] if s in SRC)
@@ -437,10 +441,17 @@ def build_listing(r):
     btns += f'<button type="button" class="btn secondary block star-btn-wide" data-id="{r["id"]}" aria-pressed="false">{T("♡ Add to shortlist","♡ 候補に追加")}</button>'
     if r["kind"] == "agency": btns += f'<a class="btn secondary block" href="{url("/share-experience/?agency="+r["id"])}">{T("Share your experience","体験を共有する")}</a>'
     if has_ll: btns += f'<a class="btn ghost block" href="{url("/map/?id="+r["id"])}"><i class="ico map"></i>{T("Show on our map","このサイトの地図で見る")}</a>'
+    qb = []
+    if r["phone"] and r["phone"][0].isdigit(): qb.append(f'<a class="btn" href="tel:{esc("".join(c for c in r["phone"] if c.isdigit() or c=="+"))}"><i class="ico tel"></i>{T("Call","電話")}</a>')
+    if web: qb.append(f'<a class="btn secondary" href="{esc(web)}" rel="noopener nofollow"><i class="ico web"></i>{T("Website","サイト")}</a>')
+    if gmaps: qb.append(f'<a class="btn secondary" href="{esc(gmaps)}" rel="noopener nofollow"><i class="ico dir"></i>{T("Directions","道順")}</a>')
+    elif r["email"]: qb.append(f'<a class="btn secondary" href="mailto:{esc(r["email"])}">{T("Email","メール")}</a>')
+    qb.append(f'<button type="button" class="btn secondary star-btn-wide short" data-id="{r["id"]}" aria-pressed="false">{T("♡ Save","♡ 保存")}</button>')
+    quick = f'<div class="quickbar" aria-label="{T("Quick actions","すぐに連絡")}">{"".join(qb)}</div>'
     body = f'''<div class="wrap pagehead"><div class="crumbs"><a href="{url("/")}">{T("Home","ホーム")}</a> › {(f'<a href="{url("/local-agencies/")}">{T("Japanese agencies","日本の不動産会社")}</a>' if r["local"] else (f'<a href="{url("/services/"+first+"/")}">{esc(dname(first))}</a>' if first else ""))} › {esc(primary_name(r))}</div>
 <div class="lh"><span class="mono lg{" org" if r["is_org"] else ""}" aria-hidden="true">{monogram(r)}</span><div><h1>{esc(primary_name(r))}</h1>{f'<div lang="{T("ja","en")}" style="font-family:var(--jp);color:var(--muted);font-size:1.1rem;margin-bottom:8px">{esc(sec)}</div>' if sec else ""}
 <div class="pill-row">{badge(r["verification"])}{"<span class='chip org'>"+esc(kind_txt(r))+"</span>" if r["is_org"] else ""}{eng_chips(r)}{chips}</div></div></div>
-<p class="sub" style="margin:12px 0 0">{esc(vlabel(r["verification"])[1])}</p>{verif_txt}{glance}
+<p class="sub" style="margin:12px 0 0">{esc(vlabel(r["verification"])[1])}</p>{verif_txt}{quick}{glance}
 <div class="listing-grid"><div><dl class="facts">{facts}</dl>{nt}{nearby_section(r)}{reviews_section(r)}
 <p class="sub" style="font-size:.85rem;margin-top:18px">{T("Sources","情報源")}: {srcs or "—"} · {T("Source date","情報の時点")}: {esc(r["source_date"] or "—")} · {T("Last verified","最終確認")}: {esc(r["last_verified"] or T("not yet","未確認"))}{(" · "+esc(r["privacy_note"])) if r["privacy_note"] else ""}</p></div>
 <aside class="actions-card" aria-label="{T("Contact and corrections","連絡と訂正")}">{btns}{"<hr>" if btns else ""}<h2>{T("Something wrong or changed?","誤りや変更がありますか？")}</h2><p>{T("Agencies move, change numbers and close. Two minutes of your time keeps this useful for the next person.","会社は移転・番号変更・閉業があります。数分のご協力が、次に探す人の助けになります。")}</p>{report_buttons(r)}
@@ -460,7 +471,7 @@ def data_blob():
         locs.append({"id": r["id"], "n": primary_name(r), "j": secondary_name(r), "a": loc_text(r), "aj": r["address_ja"], "m": r["municipality"], "m_en": r["m_en"] if LANG=="en" else r["m_ja"],
                      "d": r["svc"], "k": r["kind"], "v": r["verification"], "p": r["phone"], "w": (r["website"] if r["website"].startswith("http") or not r["website"] else "https://"+r["website"]),
                      "c": r["contact"], "s": focus_txt(r), "al": r["aliases"], "e": r["eng_level"], "mi": r["mil_level"], "r": list(r["rating"]) if r["rating"] else None,
-                     "g": 1 if r["local"] else 0, "h": r["hours"], "em": r["email"], "lic": r["license"], "et": r["english"], "mt": r["military"], "ae": r["address_en"], "rv": len(EXP.get(r["id"], [])), "la": float(r["lat"]) if r["lat"] else None, "lo": float(r["lon"]) if r["lon"] else None, "ne": r["name_en"] if LANG=="ja" else r["name_ja"]})
+                     "g": 1 if r["local"] else 0, "h": r["hours"], "em": r["email"], "lic": r["license"], "et": r["english"], "mt": r["military"], "ae": r["address_en"], "rv": len(EXP.get(r["id"], [])), "oh": r.get("open_hours", ""), "la": float(r["lat"]) if r["lat"] else None, "lo": float(r["lon"]) if r["lon"] else None, "ne": r["name_en"] if LANG=="ja" else r["name_ja"]})
     return {"base": BASE, "pfx": "/ja" if LANG == "ja" else "", "disc": {k: dname(k) for k in SVC}, "verif": {k: list(vlabel(k)) for k in "ABCD"}, "ui": ui, "locations": locs, "refs": [{"id": q["id"], "n": (q["name_ja"] if LANG == "ja" else q["name_en"]), "la": q["lat"], "lo": q["lon"], "k": q["kind"]} for q in REFS]}
 
 def build_find():
@@ -727,7 +738,8 @@ def sitemap():
     pages = ["/", "/services/", "/areas/", "/find/", "/map/", "/guide/", "/guides/", "/guides/move-in/", "/guides/rent-prices/", "/guides/avoid-problems/", "/guides/living-in-okinawa/", "/guides/oha/", "/local-agencies/", "/checklist/", "/costs/", "/housing-office/", "/glossary/", "/shortlist/", "/compare/", "/share-experience/", "/about-data/", "/sources/", "/suggest-edit/", "/for-agencies/", "/privacy/"]
     pages += [f"/services/{d}/" for d in SVC if by_svc[d]] + [f"/areas/{s}/" for s in MUNIS]
     pages += [f'/l/{r["id"]}/' for r in ROWS if not (r["verification"] in ("C", "D") and not CFG["index_unverified_pages"])]
-    allp = sorted(pages) + sorted("/ja" + p for p in pages)
+    pages = [p for p in pages if p not in ("/shortlist/", "/compare/")]
+    allp = sorted(pages) + sorted("/ja" + p for p in pages if not p.startswith(EN_ONLY))
     sm = "".join(f'<url><loc>{CFG["base_url"]}{p}</loc><lastmod>{TODAY}</lastmod></url>' for p in allp)
     write("sitemap.xml", f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>')
     write("robots.txt", f"User-agent: *\nAllow: /\nSitemap: {CFG['base_url']}/sitemap.xml\n")

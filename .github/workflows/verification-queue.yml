@@ -18,4 +18,5 @@ jobs:
           cat data/work/verification_queue.md > body.md
           printf '\n\n' >> body.md
           cat data/work/link_report.md >> body.md
+          gh label create verification --color 0e8a16 --description "Monthly re-check" 2>/dev/null || true
           gh issue create --title "Verification queue — $(date +%Y-%m)" --label verification --body-file body.md

@@ -1,6 +1,7 @@
 (function(){
   var JA=document.documentElement.lang==='ja';
   var KEY='okhd.short', CK='okhd.check';
+  function T(en,ja){ return JA?ja:en; }
   function get(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
   function set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
@@ -8,14 +9,14 @@
   function list(){ var v=get(KEY); return Array.isArray(v)?v:mem; }
   function save(a){ mem=a; set(KEY,a); }
   var HEART='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5 6.4 5c2 0 3.6 1.1 4.6 2.6h2C14 6.1 15.6 5 17.6 5 21 5 22.8 8.6 21.5 11.8 19.5 16.4 12 21 12 21z"/></svg>';
-  var S=JA?{add:'候補に追加',rem:'候補から外す',addw:'♡ 候補に追加',remw:'♥ 候補に入っています'}:{add:'Add to shortlist',rem:'Remove from shortlist',addw:'♡ Add to shortlist',remw:'♥ On your shortlist'};
+  var S=JA?{add:'候補に追加',rem:'候補から外す',addw:'♡ 候補に追加',remw:'♥ 候補に入っています',save:'♡ 保存',saved:'♥ 保存済み'}:{add:'Add to shortlist',rem:'Remove from shortlist',addw:'♡ Add to shortlist',remw:'♥ On your shortlist',save:'♡ Save',saved:'♥ Saved'};
   function starHTML(id){ return '<button type="button" class="star-btn" data-id="'+esc(id)+'" aria-pressed="false" aria-label="'+S.add+'" title="'+S.add+'">'+HEART+'</button>'; }
   window.OKTools={starHTML:starHTML};
   function sync(){
     var a=list();
     document.querySelectorAll('.star-btn,.star-btn-wide').forEach(function(b){
       var on=a.indexOf(b.getAttribute('data-id'))>=0; b.setAttribute('aria-pressed',on?'true':'false');
-      if(b.classList.contains('star-btn-wide')){ var tx=on?S.remw:S.addw; if(b.textContent!==tx) b.textContent=tx; }
+      if(b.classList.contains('star-btn-wide')){ var tx=b.classList.contains('short')?(on?S.saved:S.save):(on?S.remw:S.addw); if(b.textContent!==tx) b.textContent=tx; }
       else { b.setAttribute('aria-label',on?S.rem:S.add); b.title=on?S.rem:S.add; }
     });
     document.querySelectorAll('[data-short-count]').forEach(function(c){ var v=a.length?String(a.length):''; if(c.textContent!==v) c.textContent=v; });
@@ -26,14 +27,40 @@
     if(i>=0) a.splice(i,1); else a.push(id);
     save(a); sync(); if(window.OKShortRefresh) window.OKShortRefresh();
   });
-  new MutationObserver(function(){ sync(); }).observe(document.documentElement,{childList:true,subtree:true});
-  sync();
+
+  // ---------------- open-now badges (Japan time; listed hours only)
+  var DAYS=['sun','mon','tue','wed','thu','fri','sat'];
+  var DJA={sun:'日',mon:'月',tue:'火',wed:'水',thu:'木',fri:'金',sat:'土'}, DEN={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat'};
+  function parseOH(t){ var w={}; DAYS.forEach(function(d){w[d]=[];});
+    String(t).split(';').forEach(function(p){ var m=p.trim().match(/^(\w{3})(?:-(\w{3}))? (\d\d):(\d\d)-(\d\d):(\d\d)$/); if(!m) return;
+      var a=DAYS.indexOf(m[1]), b=m[2]?DAYS.indexOf(m[2]):a; if(a<0||b<0) return;
+      for(var i=a;;i=(i+1)%7){ w[DAYS[i]].push([+m[3]*60+ +m[4], +m[5]*60+ +m[6]]); if(i===b) break; } });
+    return w; }
+  function jstNow(){ var d=new Date(Date.now()+9*3600e3); return {day:d.getUTCDay(), min:d.getUTCHours()*60+d.getUTCMinutes()}; }
+  function hm(m){ return Math.floor(m/60)+':'+('0'+m%60).slice(-2); }
+  function openState(t){ var w=parseOH(t), n=jstNow(), today=w[DAYS[n.day]];
+    for(var i=0;i<today.length;i++){ if(n.min>=today[i][0]&&n.min<today[i][1]) return {open:true, until:today[i][1]}; }
+    for(var k=0;k<8;k++){ var d=(n.day+k)%7, sl=w[DAYS[d]];
+      for(var j=0;j<sl.length;j++){ if(k>0||sl[j][0]>n.min) return {open:false, day:k===0?null:DAYS[d], at:sl[j][0]}; } }
+    return null; }
+  var OHT=T('Based on listed hours, Japan time. Holidays and lunch breaks may differ.','掲載の営業時間（日本時間）に基づく目安です。祝日や昼休みは異なる場合があります。');
+  function fillOpen(){
+    document.querySelectorAll('.open-badge[data-oh]').forEach(function(b){
+      var st=openState(b.getAttribute('data-oh')), txt, cls;
+      if(!st){ txt=''; cls='open-badge'; }
+      else if(st.open){ txt=T('Open now · until ','営業中・')+hm(st.until)+T('',' まで'); cls='open-badge on'; }
+      else { var when=st.day?(JA?DJA[st.day]+'曜 ':DEN[st.day]+' '):''; txt=T('Closed · opens ','営業時間外・')+when+hm(st.at)+T('',' から'); cls='open-badge off'; }
+      if(b.textContent!==txt) b.textContent=txt; if(b.className!==cls) b.className=cls; if(b.title!==OHT) b.title=OHT;
+    });
+  }
+  new MutationObserver(function(){ sync(); fillOpen(); }).observe(document.documentElement,{childList:true,subtree:true});
+  setInterval(fillOpen,60000);
+  sync(); fillOpen();
 
   function hav(a,b,c,d){ var R=6371,t=Math.PI/180,dl=(c-a)*t,dn=(d-b)*t,h=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a*t)*Math.cos(c*t)*Math.sin(dn/2)*Math.sin(dn/2); return 2*R*Math.asin(Math.sqrt(h)); }
   function find(id){ var r=null; if(window.DIR) window.DIR.locations.forEach(function(x){ if(x.id===id) r=x; }); return r; }
   function refPt(id){ var r=null; if(window.DIR) (window.DIR.refs||[]).forEach(function(x){ if(x.id===id) r=x; }); return r; }
   function path(p){ return window.DIR.base+window.DIR.pfx+p; }
-  function T(en,ja){ return JA?ja:en; }
 
   // ---------------- shortlist page
   var sl=document.getElementById('shortlist-app');

@@ -340,6 +340,10 @@ def build_extra():
     build_share_experience(); build_shortlist(); build_compare()
     if LANG == "en":
         build_checklist(); build_costs(); build_housing_office(); build_glossary(); build_guides()
+    else:
+        for pth in ["/checklist/", "/costs/", "/housing-office/", "/glossary/", "/guides/"] + [f"/guides/{g[0]}/" for g in GUIDES]:
+            to = url(pth)
+            write("ja" + pth + "index.html", f'<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="robots" content="noindex"><link rel="canonical" href="{esc(CFG["base_url"] + pth)}"><meta http-equiv="refresh" content="0;url={esc(to)}"><title>英語ページへ移動します</title></head><body><p>このページは現在英語のみです。<a href="{esc(to)}">英語版を開く</a></p></body></html>')
 
 # ------------------------------------------------------------------ guides hub + five guides (EN only)
 GUIDES = [

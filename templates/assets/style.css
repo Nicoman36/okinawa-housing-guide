@@ -172,7 +172,7 @@ a.tile:hover{transform:translateY(-2px);border-color:var(--ink);color:var(--ink)
 .legend i{width:18px;height:12px;border-radius:3px;display:inline-block}
 .islands{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap;align-items:stretch}.islands .tile{width:104px;height:62px}
 .islands .label{align-self:center;font-size:.8rem;color:var(--muted);margin-right:6px}
-.north-arrow{position:absolute;right:6px;top:2px;font-size:.7rem;color:var(--muted)}
+.north-arrow{position:absolute;right:6px;top:2px;font-size:.7rem;color:var(--ink);background:var(--surface);border-radius:4px;padding:0 4px}
 
 /* ---------- listing rows */
 .results-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 12px;min-height:30px}
@@ -390,3 +390,19 @@ label.chk:has(input:checked) span{color:var(--muted);text-decoration:line-throug
 .plan:hover{border-color:var(--blue-line);background:var(--blue-tint)}
 .gloss .g-term a{text-decoration:none;color:var(--ink)}.gloss .g-term a:hover{color:var(--blue)}
 .gloss:has(.g-term a):hover{border-color:var(--blue-line)}
+
+/* listing quick actions (phones and tablets) */
+.quickbar{display:none}
+@media (max-width:900px){
+  .quickbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:14px 0 4px}
+  .quickbar .btn{min-height:48px;padding:0 10px}
+}
+/* wide tables scroll inside themselves on phones instead of pushing the page sideways */
+@media (max-width:640px){table.data{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}}
+/* bigger checkboxes and toggles for touch */
+label.chk input,.pick input{min-width:24px;min-height:24px;width:24px;height:24px}
+.open-badge:empty{display:none}
+.open-badge{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.open-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.open-badge.on{color:var(--ok);background:var(--ok-tint)}
+.open-badge.off{color:var(--quiet);background:var(--quiet-tint)}
